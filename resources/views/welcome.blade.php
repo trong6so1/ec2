@@ -271,7 +271,10 @@
         </div>
 
         @if (Route::has('login'))
-            <div class="h-14.5 hidden lg:block"></div>
+            @php
+                $islogin = 'abc';        
+            @endphp
+            <div class="h-14.5 hidden lg:block">{{ $islogin }}</div>
         @endif
     </body>
 </html>
