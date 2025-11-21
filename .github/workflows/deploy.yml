@@ -5,15 +5,46 @@ on:
     branches: [ master ]
 
 jobs:
-  deploy:
+  lint-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup PHP và extensions
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: mbstring, bcmath
+          coverage: none
+
+      # 3️⃣ Cài composer dependencies
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      # 4️⃣ Cài Laravel Pint nếu chưa có
+      - name: Install Laravel Pint (for coding standard check)
+        run: |
+          if [ ! -f ./vendor/bin/pint ]; then
+            composer require laravel/pint --dev
+          fi
+
+      # 5️⃣ Kiểm tra coding standard
+      - name: Check coding standard (Lint)
+        run: |
+          echo "Checking coding standard..."
+          ./vendor/bin/pint --test || { echo "❌ Coding rule violated! Please fix before push."; exit 1; }
+
+      # 6️⃣ Setup SSH để deploy
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.7.0
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
+      # 7️⃣ Pull code và deploy trên server
       - name: Pull and deploy on server
         run: |
           mkdir -p ~/.ssh
@@ -27,6 +58,6 @@ jobs:
             git fetch origin master
             git reset --hard origin/master
 
-            # run deploy.sh
+            # Run deploy script
             bash deploy.sh
           EOF
