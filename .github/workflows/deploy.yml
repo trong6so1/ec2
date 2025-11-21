@@ -1,0 +1,32 @@
+name: CI/CD Deploy
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Pull and deploy on server
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 47.128.234.90 >> ~/.ssh/known_hosts
+
+          ssh ubuntu@47.128.234.90 << 'EOF'
+            set -e
+            cd /var/www/ec2 || exit 1
+
+            echo "Pull latest code..."
+            git fetch origin master
+            git reset --hard origin/master
+
+            # run deploy.sh
+            bash deploy.sh
+          EOF
