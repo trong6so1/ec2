@@ -272,9 +272,10 @@
 
         @if (Route::has('login'))
             @php
-                $islogin = 'abc';        
+                $isre = 'abc';          
+                     
             @endphp
-            <div class="h-14.5 hidden lg:block">{{ $islogin }}</div>
+            <div class="h-14.5 hidden lg:block">{{ $isre }}</div>
         @endif
     </body>
 </html>
