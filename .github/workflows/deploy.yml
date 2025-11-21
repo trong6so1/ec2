@@ -30,7 +30,7 @@ jobs:
         run: composer require --dev "squizlabs/php_codesniffer=*"
 
       # 5️⃣ Kiểm tra coding standard (PSR-12)
-      - name: Check coding standard (Lint)
+      - name: Check coding standard (PSR-12)
         run: |
           echo "Checking coding standard..."
           # Kiểm tra PHP và Blade files
