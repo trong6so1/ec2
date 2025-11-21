@@ -25,18 +25,16 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-dev --optimize-autoloader
 
-      # 4️⃣ Cài Laravel Pint nếu chưa có
-      - name: Install Laravel Pint (for coding standard check)
-        run: |
-          if [ ! -f ./vendor/bin/pint ]; then
-            composer require laravel/pint --dev
-          fi
+      # 4️⃣ Cài PHP_CodeSniffer
+      - name: Install PHP_CodeSniffer
+        run: composer require --dev "squizlabs/php_codesniffer=*"
 
-      # 5️⃣ Kiểm tra coding standard
+      # 5️⃣ Kiểm tra coding standard (PSR-12)
       - name: Check coding standard (Lint)
         run: |
           echo "Checking coding standard..."
-          ./vendor/bin/pint --test || { echo "❌ Coding rule violated! Please fix before push."; exit 1; }
+          # Kiểm tra PHP và Blade files
+          ./vendor/bin/phpcs --standard=PSR12 --extensions=php,blade.php app/ resources/ || { echo "❌ Coding rule violated! Please fix before push."; exit 1; }
 
       # 6️⃣ Setup SSH để deploy
       - name: Setup SSH
